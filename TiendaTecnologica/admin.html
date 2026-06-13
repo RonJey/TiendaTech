@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css.css">
+    <title>Administración - TechStore</title>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>TechStore</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="productos.html">Productos</a></li>
+                <li><a href="admin.html">Administración</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+            </ul>
+        </nav>
+        <div class="acciones">
+            <input type="search" placeholder="Buscar productos...">
+            <button>Carrito</button>
+            <a href="login.html"><button>Cerrar Sesión</button></a>
+        </div>
+    </header>
+
+    <main>
+        <div class="crud-container">
+            <h2>Gestión de Usuarios (CRUD)</h2>
+            <div class="crud-form">
+                <input type="text" id="nombre" placeholder="Nombre completo">
+                <input type="email" id="correo" placeholder="Correo electrónico">
+                <input type="password" id="password" placeholder="Contraseña">
+                <input type="date" id="fecha_nac" title="Fecha de nacimiento">
+                <button onclick="agregarUsuario()">Añadir Usuario</button>
+            </div>
+            <table class="crud-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Contraseña</th>
+                        <th>F. Nacimiento</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-usuarios">
+                    <!-- Contenido dinámico desde JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', cargarUsuarios);
+
+        function cargarUsuarios() {
+            const tbody = document.getElementById('lista-usuarios');
+            tbody.innerHTML = '';
+            
+            const clientes = JSON.parse(localStorage.getItem('clientesRegistrados')) || [];
+            
+            // Usuario de prueba por defecto si no hay registros
+            if(clientes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td>Juan Pérez (Prueba)</td>
+                        <td>juan@example.com</td>
+                        <td>********</td>
+                        <td>1990-05-15</td>
+                        <td>
+                            <button class="action-btn edit-btn">Editar</button>
+                            <button class="action-btn delete-btn" onclick="this.parentElement.parentElement.remove()">Eliminar</button>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            clientes.forEach((cliente, index) => {
+                const tr = document.createElement('tr');
+                const hiddenPassword = '*'.repeat(cliente.password.length > 0 ? 8 : 0);
+                tr.innerHTML = `
+                    <td>${cliente.nombre}</td>
+                    <td>${cliente.correo}</td>
+                    <td>${hiddenPassword}</td>
+                    <td>${cliente.fecha}</td>
+                    <td>
+                        <button class="action-btn edit-btn">Editar</button>
+                        <button class="action-btn delete-btn" onclick="eliminarCliente(${index})">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function agregarUsuario() {
+            const nombre = document.getElementById('nombre').value;
+            const correo = document.getElementById('correo').value;
+            const password = document.getElementById('password').value;
+            const fecha = document.getElementById('fecha_nac').value;
+
+            if(nombre && correo && password && fecha) {
+                let clientes = JSON.parse(localStorage.getItem('clientesRegistrados')) || [];
+                clientes.push({ nombre, correo, password, fecha, rol: 'cliente' });
+                localStorage.setItem('clientesRegistrados', JSON.stringify(clientes));
+                
+                document.getElementById('nombre').value = '';
+                document.getElementById('correo').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('fecha_nac').value = '';
+                
+                cargarUsuarios();
+            } else {
+                alert('Por favor llene todos los campos (Nombre, Correo, Contraseña, Fecha de nacimiento)');
+            }
+        }
+
+        function eliminarCliente(index) {
+            let clientes = JSON.parse(localStorage.getItem('clientesRegistrados')) || [];
+            clientes.splice(index, 1);
+            localStorage.setItem('clientesRegistrados', JSON.stringify(clientes));
+            cargarUsuarios();
+        }
+    </script>
+
+    <footer>
+        <h3>TechStore</h3>
+        <p>Tecnología confiable para todos.</p>
+        <p>© 2026 Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>

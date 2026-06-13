@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - TechStore</title>
+    <link rel="stylesheet" href="css.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>TechStore</h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="productos.html">Productos</a></li>
+                <li><a href="#">Ofertas</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+            </ul>
+        </nav>
+        <div class="acciones">
+            <input type="search" placeholder="Buscar productos...">
+            <button>Carrito</button>
+            <a href="login.html"><button>Iniciar Sesión</button></a>
+        </div>
+    </header>
+
+    <main>
+        <div class="login-container">
+            <div class="login-box">
+                <h2>Crea tu cuenta</h2>
+                <form id="registroForm">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="reg_nombre" placeholder="Ingresa tu nombre completo" required>
+                    
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="reg_correo" placeholder="Ingresa tu correo" required>
+                    
+                    <label>Contraseña</label>
+                    <input type="password" id="reg_password" placeholder="Crea una contraseña" required>
+                    
+                    <label>Fecha de Nacimiento</label>
+                    <input type="date" id="reg_fecha" required>
+                    
+                    <button type="button" onclick="registrarCliente()">Registrarse</button>
+                </form>
+                <p style="text-align:center; margin-top:15px; font-size:14px;">
+                    ¿Ya tienes cuenta? <a href="login.html" style="color:#0284c7; text-decoration:none;">Inicia Sesión aquí</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Custom Modal -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon">✓</div>
+            <h3 id="modalTitle">¡Éxito!</h3>
+            <p id="modalMessage">Registro completado.</p>
+        </div>
+    </div>
+
+    <script>
+        function mostrarModal(tipo, titulo, mensaje) {
+            const modal = document.getElementById('customModal');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+
+            modalIcon.className = 'modal-icon ' + tipo;
+            modalIcon.innerHTML = tipo === 'success' ? '✓' : '✗';
+            modalTitle.innerText = titulo;
+            modalMessage.innerText = mensaje;
+
+            modal.classList.add('active');
+        }
+
+        function registrarCliente() {
+            const nombre = document.getElementById('reg_nombre').value;
+            const correo = document.getElementById('reg_correo').value;
+            const password = document.getElementById('reg_password').value;
+            const fecha = document.getElementById('reg_fecha').value;
+
+            if(nombre && correo && password && fecha) {
+                // Recuperar clientes existentes
+                let clientes = JSON.parse(localStorage.getItem('clientesRegistrados')) || [];
+                
+                // Verificar si el correo ya existe
+                if (clientes.some(c => c.correo === correo)) {
+                    mostrarModal('error', 'Error', 'El correo ya está registrado.');
+                    setTimeout(() => document.getElementById('customModal').classList.remove('active'), 3000);
+                    return;
+                }
+
+                // Guardar nuevo cliente
+                clientes.push({ nombre, correo, password, fecha, rol: 'cliente' });
+                localStorage.setItem('clientesRegistrados', JSON.stringify(clientes));
+
+                mostrarModal('success', '¡Registro Exitoso!', 'Tu cuenta ha sido creada. Por favor inicia sesión.');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+            } else {
+                mostrarModal('error', 'Formulario Incompleto', 'Por favor llena todos los campos.');
+                setTimeout(() => document.getElementById('customModal').classList.remove('active'), 3000);
+            }
+        }
+    </script>
+
+    <footer>
+        <h3>TechStore</h3>
+        <p>Tecnología confiable para todos.</p>
+        <p>© 2026 Todos los derechos reservados</p>
+    </footer>
+</body>
+</html>
